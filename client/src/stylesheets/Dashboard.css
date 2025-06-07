@@ -1,0 +1,37 @@
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tracked-fighters-list {
+    height: 35vh;
+    width: 30%;
+    border: solid;
+    overflow: scroll;
+}
+.tracked-fighter-card {
+    display: flex;
+    border-bottom: solid;
+
+    /* justify-content: center; */
+}
+
+.tracked-fighter-card-type {
+    padding: 10px;
+    width: 10%;
+}
+
+.tracked-fighter-card-name {
+    width: 80%;
+    padding: 10px;
+}
+
+.tracked-fighter-card img {
+    width: 30px;
+    height: 30px;
+}
+
+.tracked-fighter-card-delete {
+    padding: 10px;    
+}
