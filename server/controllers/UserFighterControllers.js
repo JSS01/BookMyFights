@@ -34,12 +34,14 @@ const addUserFighter = async (userId, fighterId) => {
 
 const deleteUserFighter = async (userId, fighterId) => {
   try {
-    const result = await db.execute("DELETE FROM User_fighters WHERE user_id=(?) AND fighter_id=(?)", [userId, fighterId]);
-    console.log("Delete result: ", result);
+    const [ result ] = await db.execute("DELETE FROM User_fighters WHERE user_id=(?) AND fighter_id=(?)", [userId, fighterId]);
+    console.log(`Deleting Fighter ID: : ${fighterId}`, result);
+    console.log("Affected rows is: ", result.affectedRows);
+    
     return result.affectedRows > 0;
   } catch (err) {
-    console.err("Error deleting fighter: ", err);
-    throw err;;
+    console.error("Error deleting fighter: ", err);
+    throw err;
   }
 }
 

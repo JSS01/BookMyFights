@@ -26,9 +26,10 @@ router.post("/", protect, async (req, res) => {
     } catch (err) {
       if (err.code == "DUPLICATE") {
         res.status(409).json({ message: err.message });
+      } else {
+        console.error(err)
+        res.status(500).json({ message: "Internal server error adding fighter to user list" });
       }
-      console.error(err)
-      res.status(500).json({ message: "Internal server error adding fighter to user list" });
     }})
 
 // Delete a fighter 
@@ -37,6 +38,7 @@ router.delete("/", protect, async (req, res) => {
     const userId = req.user.userID; 
     const { fighterId } = req.body;  
     const didDelete = await deleteUserFighter(userId, fighterId);
+    console.log("DidDelete is: ", didDelete)
     if (didDelete) {
       res.status(201).json({ message: "Fighter deleted from user's list" });
     } else {
