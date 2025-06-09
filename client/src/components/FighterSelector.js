@@ -1,55 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { Autocomplete, TextField, Button, Box } from "@mui/material";
-
-// const FighterSelector = ({ onAddFighter }) => {
-//   const [fighters, setFighters] = useState([]);
-//   const [selectedFighter, setSelectedFighter] = useState(null);
-
-//   // Fetch all fighters
-//   useEffect(() => {
-//     const fetchFighters = async () => {
-//       try {
-//         const res = await axios.get("http://localhost:3001/fighters", { withCredentials: true });
-//         setFighters(res.data.fighters);
-//       } catch (err) {
-//         console.error("Failed to fetch fighters", err);
-//       }
-//     };
-//     fetchFighters();
-//   }, []);
-
-//   // Handle add button click
-//   const handleAdd = () => {
-//     if (selectedFighter) {
-//       onAddFighter(selectedFighter); // Call parent handler
-//       setSelectedFighter(null); // Reset input
-//     }
-//   };
-
-//   return (
-//     <Box sx={{ width: 400, display: "flex", gap: 2, alignItems: "center" }}>
-//       <Autocomplete
-//         value={selectedFighter}
-//         onChange={(event, newValue) => setSelectedFighter(newValue)}
-//         options={fighters}
-//         getOptionLabel={(option) => `${option.name} (${option.type})`}
-//         sx={{ flexGrow: 1 }}
-//         renderInput={(params) => <TextField {...params} label="Select Fighter" variant="outlined" />}
-//         isOptionEqualToValue={(option, value) => option.id === value.id}
-//       />
-//       <Button variant="contained" onClick={handleAdd} disabled={!selectedFighter}>
-//         Add
-//       </Button>
-//     </Box>
-//   );
-// };
-
-// export default FighterSelector;
-
-
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -76,7 +24,7 @@ const FighterSelector = ({ onAddFighter }) => {
         const res = await axios.get("http://localhost:3001/fighters", {
           withCredentials: true,
         });
-        setFighters(res.data.fighters);
+        setFighters(res.data.fighters.sort((f1, f2) => f1.name > f2.name ? 1 : -1));
       } catch (err) {
         console.error("Failed to fetch fighters", err);
       }
