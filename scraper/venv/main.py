@@ -16,11 +16,11 @@ app = FastAPI(
     version="1.0.0"
 )
 # Create scraper instances
-ufc_scraper = UFCScraper(BASE_UFC_URL)
-boxing_scraper = BoxingScraper(BASE_BOXING_URL)
+UFC_SCRAPER = UFCScraper(BASE_UFC_URL)
+BOXING_SCRAPER = BoxingScraper(BASE_BOXING_URL)
 
 
-
+# Models for responses 
 class EventResponse(BaseModel):
     date: datetime
     location: str
@@ -29,26 +29,26 @@ class FightResponse(BaseModel):
     fighters: List[str]
     event: EventResponse
 
-
+# Cached scraper functions 
 @ttl_cache(maxsize=1, ttl=60)
 def cached_get_all_ufc_fights():
-    return ufc_scraper.get_all_upcoming_fights()
+    return UFC_SCRAPER.get_all_upcoming_fights()
 
 @ttl_cache(maxsize=128, ttl=60)
 def cached_get_upcoming_ufc_fights(fighters_key: tuple[str]):
-    return ufc_scraper.get_upcoming_fights_for(list(fighters_key))
+    return UFC_SCRAPER.get_upcoming_fights_for(list(fighters_key))
 
 
 @ttl_cache(maxsize=1, ttl=60)
 def cached_get_all_boxing_fights():
-    return boxing_scraper.get_all_upcoming_fights()
+    return BOXING_SCRAPER.get_all_upcoming_fights()
 
 
 @ttl_cache(maxsize=128, ttl=60)
 def cached_get_upcoming_boxing_fights(fighters_key: tuple[str]):
-    return boxing_scraper.get_upcoming_fights_for(list(fighters_key))
+    return BOXING_SCRAPER.get_upcoming_fights_for(list(fighters_key))
 
-# Routes 
+# API Routes 
 @app.get("/")
 def root():
     return {"Hello" : "World"}
@@ -65,7 +65,7 @@ async def get_all_ufc_fights():
 async def get_upcoming_ufc_fights(request: List[str]):
     try:
         # Normalize list to make the cache hit consistent
-        fighters_key = tuple(sorted([name.strip().lower() for name in request.fighters]))
+        fighters_key = tuple(sorted([name.strip().lower() for name in request]))
         upcoming_fights = await asyncio.to_thread(cached_get_upcoming_ufc_fights, fighters_key)
         return upcoming_fights
     except Exception as e:

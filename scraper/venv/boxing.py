@@ -6,20 +6,12 @@ import requests
 from constants import *
 from typing import List
 import logging
+from data_models import *
 
 # Logging configuration 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-@dataclass 
-class Event:
-    date: datetime
-    location: str
-
-@dataclass
-class Fight:
-    fighters: List[str]
-    event: Event
 
 class BoxingScraper:
     '''
@@ -121,12 +113,3 @@ class BoxingScraper:
         ]
 
         return matching_fights
-
-
-def main():
-    scraper = BoxingScraper(BASE_BOXING_URL)
-    for fight in scraper.get_upcoming_fights_for([]):
-        print(fight, "\n")
-
-if __name__ == "__main__":
-    main()

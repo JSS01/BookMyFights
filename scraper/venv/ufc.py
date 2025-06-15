@@ -7,22 +7,12 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from constants import *
+from data_models import *
 
 # Logging configuration 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-# Data Models 
-@dataclass
-class Event:
-    """Represents a single UFC event."""
-    date: datetime
-    location: str
-
-@dataclass 
-class Fight:
-    fighters: List[str]
-    event: Event
 
 # --- Main Scraper Class ---
 class UFCScraper:
