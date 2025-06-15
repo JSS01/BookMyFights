@@ -11,37 +11,18 @@ from constants import *
 # Logging configuration 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Custom Exceptions for Error Handling
-class UFCScraperException(Exception):
-    """Base exception for the scraper."""
-    pass
-
-class PageLoadError(UFCScraperException):
-    """Raised when a web page fails to load."""
-    pass
-
-class ParsingError(UFCScraperException):
-    """Raised when HTML parsing fails to find expected elements."""
-    pass
 
 # Data Models 
 @dataclass
 class Event:
     """Represents a single UFC event."""
-    title: str
-    url: str
-    date_time: datetime
-    venue: str
+    date: datetime
     location: str
 
-@dataclass
+@dataclass 
 class Fight:
-    """Represents a single fight within an event."""
-    event_title: str
     fighters: List[str]
-    date_time: datetime
-    venue: str
-    location: str
+    event: Event
 
 # --- Main Scraper Class ---
 class UFCScraper:
@@ -62,12 +43,12 @@ class UFCScraper:
             return BeautifulSoup(response.text, 'html.parser')
         except requests.exceptions.RequestException as e:
             logging.error(f"Failed to load page: {url}. Error: {e}")
-            raise PageLoadError(f"Could not load page {url}") from e
+            raise Exception(f"Could not load page {url}") from e
 
     def _parse_event_datetime(self, date_string: str) -> Optional[datetime]:
         """
         Parses a date string like "Sat, Jun 14 / 10:00 PM EDT" into a datetime object.
-        Handles the year-rollover edge case.
+        Currently does not handle year rollover cases.
         """
         pattern = r"^\w+, (\w{3}) (\d{1,2}) / (\d{1,2}):(\d{2}) (AM|PM)"
         match = re.match(pattern, date_string)
@@ -89,7 +70,7 @@ class UFCScraper:
             logging.error(f"Error parsing date/time from '{date_string}': {e}")
             return None
 
-    def _scrape_upcoming_events(self) -> List[Event]:
+    def _scrape_upcoming_events(self) -> List[tuple[str, Event]]:
         """Scrapes the main events page for future events."""
         logging.info(f"Fetching events from {self.events_url}")
         soup = self._get_soup(self.events_url)
@@ -124,14 +105,13 @@ class UFCScraper:
                     logging.warning("Skipping card, missing title or venue.")
                     continue
 
+                event_url = urljoin(self.base_url, title_tag['href'])
+                
                 event = Event(
-                    title=title_tag.get_text(strip=True),
-                    url=urljoin(self.base_url, title_tag['href']),
-                    date_time=event_dt,
-                    venue=venue_tag.get_text(strip=True),
+                    date=event_dt,
                     location=location_str
                 )
-                upcoming_events.append(event)
+                upcoming_events.append((event_url, event))
             except (AttributeError, KeyError) as e:
                 logging.warning(f"Could not fully parse an event card. Error: {e}")
                 continue # Move to the next card
@@ -139,17 +119,15 @@ class UFCScraper:
         logging.info(f"Found {len(upcoming_events)} upcoming events.")
         return upcoming_events
 
-    def _scrape_fights_from_event(self, event: Event) -> List[Fight]:
+    def _scrape_fights_from_event(self, event_url: str, event: Event) -> List[Fight]:
         """Scrapes all fights from a single event page."""
-        logging.info(f"Visiting event page: {event.title}")
-        soup = self._get_soup(event.url)
+        logging.info(f"Visiting event url: {event_url}")
+        soup = self._get_soup(event_url)
         
-        # Use the event page's title for more accuracy (e.g., includes ': Holloway vs Gaethje')
-        page_title = soup.find('h1').get_text(strip=True) if soup.find('h1') else event.title
         
         fight_list_items = soup.select('.c-listing-fight__content')
         if not fight_list_items:
-            logging.warning(f"No fight listings found on page for {event.title}")
+            logging.warning(f"No fight listings found on page for url: {event_url}")
             return []
 
         fights = []
@@ -161,12 +139,10 @@ class UFCScraper:
             
             names = [name.get_text(separator=' ', strip=True) for name in name_tags]
             if len(names) == 2:
+
                 fights.append(Fight(
-                    event_title=page_title,
                     fighters=names,
-                    date_time=event.date_time,
-                    venue=event.venue,
-                    location=event.location
+                    event=event
                 ))
         return fights
 
@@ -176,12 +152,12 @@ class UFCScraper:
         """
         future_events = self._scrape_upcoming_events()
         all_fights = []
-        for event in future_events:
+        for event_url, event in future_events:
             try:
-                fights_in_event = self._scrape_fights_from_event(event)
+                fights_in_event = self._scrape_fights_from_event(event_url, event)
                 all_fights.extend(fights_in_event)
-            except (PageLoadError, ParsingError) as e:
-                logging.error(f"Could not scrape fights for event '{event.title}': {e}")
+            except Exception as e:
+                logging.error(f"Could not scrape fights for event '{event_url}': {e}")
                 continue # Skip to the next event
         return all_fights
 
@@ -214,32 +190,3 @@ class UFCScraper:
                         found_fights[original_name] = fight
         
         return found_fights
-
-def main():
-    fighters_to_find = [
-        "Josh Emmett", "Jamahal Hill", "Kamaru Usman", "Joaquin Buckley", "Ilia Topuria", 
-        "Mansur Abdul-Malik", "Dustin Poirier", "Conor McGregor"
-    ]
-    
-    scraper = UFCScraper()
-    
-    try:
-        upcoming_fights = scraper.get_upcoming_fights_for(fighters_to_find)
-        if upcoming_fights:
-            print("\n--- Upcoming Fights Found ---")
-            for fighter, details in upcoming_fights.items():
-                print(f"  🥊 Fighter: {fighter}")
-                print(f"    Event:    {details.event_title}")
-                print(f"    Matchup:  {' vs '.join(details.fighters)}")
-                print(f"    Date:     {details.date_time.strftime('%a, %b %d, %Y at %I:%M %p')}")
-                print(f"    Venue:    {details.venue}")
-                print(f"    Location: {details.location}")
-                print("-" * 30)
-        else:
-            print("\nNo upcoming fights found for the specified fighters.")
-            
-    except UFCScraperException as e:
-        print(f"\nAn error occurred during scraping: {e}")
-
-if __name__ == "__main__":
-    main()
