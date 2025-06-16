@@ -73,6 +73,21 @@ const Dashboard = () => {
     }
   };
 
+  const syncFights = async () => {
+    try {
+      const accessToken = localStorage.getItem("google_access_token")
+      const res = await axios.post(
+        "http://localhost:3001/calendar/sync-fights", 
+        {accessToken: accessToken},
+        { withCredentials: true }
+      )
+      const numEventsAdded = res.data.events.length;
+      showSnackbar(`Successfully added ${numEventsAdded} fights to your calendar`)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
 
   const filteredFighters = sportFilter === "all" ? userFighters :
   userFighters.filter(f => f.type === sportFilter);
@@ -90,6 +105,7 @@ const Dashboard = () => {
          <FighterSelector onAddFighter={handleAddFighter}> </FighterSelector>
       </div>  
       <Button
+      onClick={syncFights}
       style={{marginTop: 30}}
       variant="contained"
       startIcon={<SyncIcon />}

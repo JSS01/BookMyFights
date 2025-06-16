@@ -3,6 +3,8 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../stylesheets/HomePage.css';
+import { Button } from '@mui/material';
+
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -12,7 +14,6 @@ const HomePage = () => {
     flow: 'implicit', 
     onSuccess: async (tokenResponse) => {
       try {
-        console.log("Token response:", tokenResponse); 
         
         // Send access token to backend
         await axios.post("http://localhost:3001/auth/google", {
@@ -20,7 +21,7 @@ const HomePage = () => {
         }, { withCredentials: true });
 
         // Store token client-side 
-        // localStorage.setItem("google_access_token", tokenResponse.access_token);
+        localStorage.setItem("google_access_token", tokenResponse.access_token);
 
         navigate("/dashboard");
       } catch (err) {
@@ -44,9 +45,14 @@ const HomePage = () => {
 
       <div className="google-login-box">
         <p>Sign in to your Google Account</p>
-        <button onClick={() => login()} className="google-login-button">
-          Sign in with Google
-        </button>
+         <Button
+        variant="contained"
+        color="primary"
+        onClick={() => login()}
+        sx={{ mt: 3 }}
+      >
+        Sign in with Google
+      </Button>
       </div>
     </div>
   );
