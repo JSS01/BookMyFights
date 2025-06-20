@@ -6,6 +6,26 @@ import { getUpcomingFights, addEventToCalendar, createCalendarEvent } from '../c
 const router = express.Router();
 
 
+router.get("/upcoming-fights", protect, async (req, res) => {
+    try {
+        // Should be available from the middleware
+        const userId = req.user.userID;
+        // Get user's upcoming fights 
+        const fights = await getUpcomingFights(userId);
+        // Create events for each fight
+        const fightEvents = []
+        for (const [fighterName, fight] of Object.entries(fights)) {
+            const event = createCalendarEvent(fighterName, fight)            
+            fightEvents.push(event);
+        }
+        res.status(200).json({fights: fightEvents})
+    } catch (err) {
+        console.error('Error with getting upcoming fights', err.message);
+        res.status(500).json({ message: 'Server error finding upcoming fights.' });
+    }
+
+})
+
 router.post("/sync-fights", protect, async (req, res) => {
     try {
         // Should be available from the middleware

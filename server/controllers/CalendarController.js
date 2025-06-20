@@ -58,5 +58,4 @@ const addEventToCalendar = async (auth, event) => {
     }
 
 
-
 export { getUpcomingFights, createCalendarEvent, addEventToCalendar }
