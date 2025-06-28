@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import FighterSelector from '../components/FighterSelector';
+import FighterSelector from '../components/AddFighterSelector.js';
 import axios from 'axios';
 import { useUser } from '../contexts/UserContext';
-import TrackedFightersTable from '../components/TrackedFightersTable';
-import FighterFilter from '../components/FighterFilter';
 import { Button } from '@mui/material';
 import SyncIcon from '@mui/icons-material/Sync';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import { Snackbar, Alert, Container, Typography, Box } from '@mui/material';
-import SyncedFightsModal from '../components/SyncedFightsModal';
+import FightsModal from '../components/FightsModal.js';
+import FightersSection from '../components/FightersSection';
 
+
+// TODO: When viewing upcoming fights, can add one fight at a time, 
+// and have button to add all fights to calendar as an option in that screen
 
 const Dashboard = () => {
   
   const { user } = useUser();   
   const [userFighters, setUserFighters] = useState([]);
   const [sportFilter, setSportFilter] = useState("all");
-  const [syncedEvents, setSyncedEvents] = useState([]);
+  const [upcomingFights, setupcomingFights] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [modalTitle, setModalTitle] = useState("Upcoming Fights");
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -84,8 +85,7 @@ const Dashboard = () => {
         { withCredentials: true }
       )
       const numEventsAdded = res.data.events.length;
-      setSyncedEvents(res.data.events); 
-      setModalTitle("Synced Fights"); 
+      setupcomingFights(res.data.events); 
       setOpenModal(true)
 
       if (numEventsAdded === 0) {
@@ -105,10 +105,8 @@ const Dashboard = () => {
         { withCredentials: true }
       )
       const fights = res.data.fights
-      setSyncedEvents(fights); 
-      setModalTitle("Upcoming Fights"); 
+      setupcomingFights(fights); 
       setOpenModal(true)
-
       
     } catch (err) {
       console.error(err)
@@ -121,24 +119,29 @@ const Dashboard = () => {
 
 
 
-  
-
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom> 
+      <Typography variant="h4" textAlign={"center"} gutterBottom> 
         Welcome, {user.userName}
       </Typography>
 
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" style={{marginBottom: 20}}>Your Fighters</Typography>
-          <FighterFilter sportFilter={sportFilter} setSportFilter={setSportFilter} />
-          <TrackedFightersTable
-            filteredFighters={filteredFighters}
-            deleteUserFighter={deleteUserFighter}
-          />
-        </Box>
+        <FightersSection 
+        filteredFighters = {filteredFighters} 
+        deleteUserFighter = {deleteUserFighter}
+        sportFilter = {sportFilter}
+        setSportFilter = {setSportFilter}
+        >
+        </FightersSection>
 
-      <Box sx={{ mb: 4 }}>
+      <Box  sx={{
+            height: '10vh',
+            border: '1px solid #ccc',      
+            borderRadius: 4,               
+            padding: 3,                    
+            backgroundColor: 'background.paper', 
+            boxShadow: 1,                  
+            mb: 2                          
+          }}>      
         <Typography variant="h5" gutterBottom>
           Add Fighter
         </Typography>
@@ -146,7 +149,7 @@ const Dashboard = () => {
       </Box>
       
 
-      <Box sx={{ textAlign: 'center', mb: 4}}>
+      <Box sx={{ textAlign: 'center', mb: 4, display: 'flex', justifyContent: 'center', gap: 4}}>
 
         <Button
           onClick={viewFights}
@@ -155,6 +158,8 @@ const Dashboard = () => {
           sx={{
             backgroundColor: 'green',
             color: 'white',
+            borderRadius: 3,
+            height: 60,
             '&:hover': { backgroundColor: '#1565c0' },
           }}
         >
@@ -168,6 +173,7 @@ const Dashboard = () => {
           sx={{
             backgroundColor: '#1976d2',
             color: 'white',
+            borderRadius: 3,
             '&:hover': { backgroundColor: '#1565c0' },
           }}
         >
@@ -176,9 +182,9 @@ const Dashboard = () => {
 
       </Box>
       
-
-      <SyncedFightsModal   title={modalTitle} syncedEvents={syncedEvents} openModal={openModal} setOpenModal={setOpenModal}>
-      </SyncedFightsModal>
+     
+      <FightsModal fights={upcomingFights} openModal={openModal} setOpenModal={setOpenModal}>
+      </FightsModal>
 
       <Snackbar
         open={snackbar.open}
@@ -199,3 +205,4 @@ const Dashboard = () => {
   )
 }
 export default Dashboard
+

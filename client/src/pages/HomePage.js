@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../stylesheets/HomePage.css';
 import { Button } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+
 
 
 const HomePage = () => {
@@ -14,15 +16,12 @@ const HomePage = () => {
     flow: 'implicit', 
     onSuccess: async (tokenResponse) => {
       try {
-        
-        // Send access token to backend
         await axios.post("http://localhost:3001/auth/google", {
           accessToken: tokenResponse.access_token,
         }, { withCredentials: true });
 
         // Store token client-side 
         localStorage.setItem("google_access_token", tokenResponse.access_token);
-
         navigate("/dashboard");
       } catch (err) {
         console.error("Error sending access token to backend:", err);
@@ -35,25 +34,27 @@ const HomePage = () => {
 
   return (
     <div className="HomePage">
+
       <h1 className="text-5xl font-bold mb-6 text-center">
-        🥊 BookMyFights 🥊
+         Welcome To BookMyFights 
       </h1>
-      <p className="text-xl text-gray-300 mb-8 text-center max-w-md">
-        Never miss a UFC or boxing match again. Sync all upcoming fights
-        directly to your Google Calendar.
+      <p className="text-xl text-gray-300 mb-8 text-center">
+        Never miss your favorite fighters' upcoming UFC or boxing matches again.<br/> Sync their upcoming fights
+        directly to your Google Calendar with one click.
       </p>
 
-      <div className="google-login-box">
-        <p>Sign in to your Google Account</p>
-         <Button
-        variant="contained"
-        color="primary"
-        onClick={() => login()}
-        sx={{ mt: 3 }}
-      >
-        Sign in with Google
-      </Button>
-      </div>
+      <img src="/homePage.png" alt="boxing gloves" height={200}>
+      </img>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<GoogleIcon />}
+          onClick={() => login()}
+          sx={{ mt: 3, fontWeight: 'bold', fontSize: '1.1rem' }}
+        >
+          Sign in with Google
+        </Button>
+
     </div>
   );
 };
