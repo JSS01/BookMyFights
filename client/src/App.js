@@ -2,7 +2,7 @@ import './App.css';
 import Navbar from './components/Navbar.js';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import HomePage from './pages/HomePage';
+import HomePage from './pages/Homepage';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { UserProvider } from './contexts/UserContext.js'
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";

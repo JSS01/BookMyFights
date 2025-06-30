@@ -1,9 +1,18 @@
-import React from 'react'
-import { Box, Typography } from '@mui/material';
+import React, { useState } from 'react'
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+
 import TrackedFightersTable from '../components/TrackedFightersTable.js';
 import FighterFilter from '../components/FighterFilter.js';
+import FighterSelector from '../components/AddFighterSelector.js';
 
-const FightersSection = ({filteredFighters, deleteUserFighter, sportFilter, setSportFilter }) => {
+const FightersSection = ({userFighters, deleteUserFighter, onAddFighter }) => {
+  const [open, setOpen] = useState(false);
+  const [sportFilter, setSportFilter] = useState("all");
+
+  const filteredFighters = sportFilter === "all" ? userFighters :
+  userFighters.filter(f => f.type === sportFilter);
+
   return (
     <Box sx={{
         height: '50vh',
@@ -14,9 +23,21 @@ const FightersSection = ({filteredFighters, deleteUserFighter, sportFilter, setS
         boxShadow: 1,                  
         mb: 4                          
     }}>
-    <Typography variant="h5" style={{marginBottom: 20, textAlign: 'center'}}>Your Fighters</Typography>
-    <FighterFilter sportFilter={sportFilter} setSportFilter={setSportFilter} />
-    <TrackedFightersTable filteredFighters={filteredFighters} deleteUserFighter={deleteUserFighter}/>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h5" style={{ textAlign: 'center' }}>Your Fighters</Typography>
+        <Button variant="contained" startIcon={<AddIcon/>} onClick={() => setOpen(true)}>Add Fighter</Button>
+      </Box>
+      <FighterFilter sportFilter={sportFilter} setSportFilter={setSportFilter} />
+      <TrackedFightersTable filteredFighters={filteredFighters} deleteUserFighter={deleteUserFighter}/>
+      { /* Add Fighter Modal */ }
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Add a Fighter</DialogTitle>
+        <DialogContent>
+          <div style={{marginTop: 16}}>
+            <FighterSelector onAddFighter={(fighter) => { onAddFighter(fighter); setOpen(false); }} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </Box>
   )
 }

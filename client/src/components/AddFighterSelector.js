@@ -12,6 +12,9 @@ import {
   DialogActions,
 } from "@mui/material";
 
+import AddIcon from '@mui/icons-material/Add';
+
+
 const FighterSelector = ({ onAddFighter }) => {
   const [fighters, setFighters] = useState([]);
   const [selectedFighter, setSelectedFighter] = useState(null);
@@ -51,7 +54,7 @@ const FighterSelector = ({ onAddFighter }) => {
 
   return (
     <>
-      <Box sx={{ height: 50, width: 400, display: "flex", gap: 2, alignItems: "center" }}>
+      <Box sx={{ height: 70, width: 400, display: "flex", gap: 2, alignItems: "center" }}>
         <Autocomplete
           value={selectedFighter}
           onChange={(event, newValue) => setSelectedFighter(newValue)}
@@ -62,14 +65,22 @@ const FighterSelector = ({ onAddFighter }) => {
             <TextField {...params} label="Select Fighter" variant="outlined" />
           )}
           isOptionEqualToValue={(option, value) => option.id === value.id}
+          slotProps={{
+            paper: {
+              sx: {
+                maxHeight: 200, // Dropdown height
+              },
+            },
+          }}
         />
         <Button
           sx={{height: 50}}
           variant="contained"
+          startIcon={<AddIcon />}
           onClick={handleAdd}
           disabled={!selectedFighter}
         >
-          Add
+          Add Fighter
         </Button>
       </Box>
 

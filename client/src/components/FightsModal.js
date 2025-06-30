@@ -18,7 +18,7 @@ import {
   } from '@mui/material';
 
   import SyncIcon from '@mui/icons-material/Sync';
-
+  import axios from 'axios';
 
 
 
@@ -44,9 +44,23 @@ const FightsModal = ({fights, openModal, setOpenModal}) => {
         }
     }
 
-    const handleSubmit = () => {
-        console.log(selectedFights.map((idx) => fights[idx]));
-        
+    const handleSubmit = async () => {
+        const fightsToSync = selectedFights.map((idx) => fights[idx]);
+        try {
+            const accessToken = localStorage.getItem("google_access_token")
+            const response = await axios.post(
+                "http://localhost:3001/calendar/sync-fights", 
+                {accessToken: accessToken, fights: fightsToSync},
+                { withCredentials: true }
+            )
+            console.log("✅ Synced Events:", response.data.events);
+            alert("Successfully synced selected fights to Google Calendar.");
+
+        } catch (err) {
+            console.error("❌ Error syncing fights:", err.response?.data || err.message);
+            alert("Beeg errro")
+        }
+
     }
 
   return (
@@ -105,6 +119,3 @@ const FightsModal = ({fights, openModal, setOpenModal}) => {
 }
 
 export default FightsModal
-
-
-

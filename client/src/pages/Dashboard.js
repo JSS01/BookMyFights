@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import FighterSelector from '../components/AddFighterSelector.js';
 import axios from 'axios';
 import { useUser } from '../contexts/UserContext';
 import { Button } from '@mui/material';
 import SyncIcon from '@mui/icons-material/Sync';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import { Snackbar, Alert, Container, Typography, Box } from '@mui/material';
+
 import FightsModal from '../components/FightsModal.js';
 import FightersSection from '../components/FightersSection';
 
@@ -17,7 +17,6 @@ const Dashboard = () => {
   
   const { user } = useUser();   
   const [userFighters, setUserFighters] = useState([]);
-  const [sportFilter, setSportFilter] = useState("all");
   const [upcomingFights, setupcomingFights] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
@@ -114,8 +113,7 @@ const Dashboard = () => {
   }
 
 
-  const filteredFighters = sportFilter === "all" ? userFighters :
-  userFighters.filter(f => f.type === sportFilter);
+
 
 
 
@@ -126,31 +124,14 @@ const Dashboard = () => {
       </Typography>
 
         <FightersSection 
-        filteredFighters = {filteredFighters} 
-        deleteUserFighter = {deleteUserFighter}
-        sportFilter = {sportFilter}
-        setSportFilter = {setSportFilter}
+        userFighters={userFighters}
+        deleteUserFighter={deleteUserFighter}
+        onAddFighter={handleAddFighter}
         >
         </FightersSection>
 
-      <Box  sx={{
-            height: '10vh',
-            border: '1px solid #ccc',      
-            borderRadius: 4,               
-            padding: 3,                    
-            backgroundColor: 'background.paper', 
-            boxShadow: 1,                  
-            mb: 2                          
-          }}>      
-        <Typography variant="h5" gutterBottom>
-          Add Fighter
-        </Typography>
-        <FighterSelector onAddFighter={handleAddFighter} />
-      </Box>
-      
-
+      {/* View Fights Button */ }
       <Box sx={{ textAlign: 'center', mb: 4, display: 'flex', justifyContent: 'center', gap: 4}}>
-
         <Button
           onClick={viewFights}
           variant="contained"
@@ -165,24 +146,10 @@ const Dashboard = () => {
         >
           View Upcoming Fights
         </Button>
-
-        <Button
-          onClick={syncFights}
-          variant="contained"
-          startIcon={<SyncIcon />}
-          sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            borderRadius: 3,
-            '&:hover': { backgroundColor: '#1565c0' },
-          }}
-        >
-          Sync Fights To Calendar
-        </Button>
-
       </Box>
       
      
+      {/* Modals and Snackbar */}
       <FightsModal fights={upcomingFights} openModal={openModal} setOpenModal={setOpenModal}>
       </FightsModal>
 
