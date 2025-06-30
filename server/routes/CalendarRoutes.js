@@ -15,7 +15,7 @@ router.get("/upcoming-fights", protect, async (req, res) => {
         // Create events for each fight
         const fightEvents = []
         for (const [fighterName, fight] of Object.entries(fights)) {
-            const event = createCalendarEvent(fighterName, fight)            
+            const event = createCalendarEvent(fight)            
             fightEvents.push(event);
         }
         res.status(200).json({fights: fightEvents})
@@ -26,23 +26,23 @@ router.get("/upcoming-fights", protect, async (req, res) => {
 
 })
 
+
 router.post("/sync-fights", protect, async (req, res) => {
     try {
-        // Should be available from the middleware
-        const userId = req.user.userID;
         // Access token for google api
-        const { accessToken } = req.body;
-        // Get fights to be synced
-        const fights = await getUpcomingFights(userId);
+        const { accessToken, fights } = req.body;
 
+        if (!fights || !Array.isArray(fights) || fights.length === 0) {
+            return res.status(400).json({ message: 'No fights provided to sync.' });
+        }
+        
         // Create OAuth2 Client 
         const auth = new google.auth.OAuth2();
         auth.setCredentials({ access_token: accessToken });
     
         const insertedEvents = [];
-        for (const [fighterName, fight] of Object.entries(fights)) {
-            const event = createCalendarEvent(fighterName, fight)            
-            const addedEvent = await addEventToCalendar(auth, event)
+        for (const fight of fights) {
+            const addedEvent = await addEventToCalendar(auth, fight)
             insertedEvents.push(addedEvent)
         }
 
@@ -53,7 +53,7 @@ router.post("/sync-fights", protect, async (req, res) => {
         console.error('Error with syncing fights', err.message);
         res.status(500).json({ message: 'Server error syncing fights.' });
     }
-});
+})
 
 
 export default router

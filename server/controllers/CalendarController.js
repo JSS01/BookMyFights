@@ -1,6 +1,5 @@
 import { getUserFighters } from "./UserFighterControllers.js"
 import axios from "axios"
-import crypto from "crypto"
 import { google } from "googleapis";
 
 // Calendar API 
@@ -29,14 +28,14 @@ const getUpcomingFights = async (userId) => {
     return {...upcomingBoxingFights.data, ...upcomingUFCFights.data}
 }
 
-const createCalendarEvent = (fighterName, fight) => {
+const createCalendarEvent = (fight) => {
     const startTime = new Date(fight.event.date);
     // Set end time to 2hrs later
     const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); 
     const event = {
         summary: `${fight.fighters.join(" vs ")}`,
         location: fight.event.location,
-        description: `\nTracked fighter: ${fighterName}`,
+        description: `\nBookMyFights Fight`,
         start: { dateTime: startTime.toISOString() },
         end: { dateTime: endTime.toISOString() },
     };

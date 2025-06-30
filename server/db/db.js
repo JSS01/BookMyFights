@@ -1,16 +1,20 @@
-// server/db/db.js
 import mysql from 'mysql2/promise';
 
+import dotenv from 'dotenv'
 
-const connection = await mysql.createConnection({
-  host: 'localhost',
-  user: 'me',           // I created this user
-  password: 'classic1jake', // I made this password 
-  database: 'BookMyFight', // Name I chose for the db
-});
+dotenv.config()
 
-console.log('✅ MySQL connected');
-
-
+let connection;
+try {
+  connection = await mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  });
+  console.log('MySQL connected');
+} catch (err) {
+  console.error('Database connection failed:', err);
+}
 
 export default connection;
