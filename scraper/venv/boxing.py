@@ -50,7 +50,8 @@ class BoxingScraper:
         Uses a regular expression to parse the event headline for 
         details like the date and location. 
         '''
-        pattern = r"(.+?)\.?\s+(\d{1,2}):(.+?)\(?"
+        pattern = r"^(?P<month>\w+)\.?\s+(?P<day>\d{1,2}):\s+(?P<location>.+?)(?:\s*\(.*\))?$"
+
         match = re.search(pattern, event_str)
         if match:
             month = match.group(1).strip()
@@ -102,14 +103,19 @@ class BoxingScraper:
         
     def get_upcoming_fights_for(self, fighters: List[str]) -> List[Fight]:
         all_fights = self.get_all_upcoming_fights()
-        found_fights = {}
-        
-        # Normalize input to lower case for case-insensitive comparison
-        target_fighters = set(f.lower() for f in fighters)
+        found_fights: dict[str, Fight] = {}
 
-        matching_fights = [
-            fight for fight in all_fights
-            if any(fighter.lower() in target_fighters for fighter in fight.fighters)
-        ]
+        # Normalize input for case-insensitive matching
+        input_fighter_map = {
+            f.lower(): f for f in fighters
+        }
 
-        return matching_fights
+        for fight in all_fights:
+            for fighter in fight.fighters:
+                normalized = fighter.lower()
+                if normalized in input_fighter_map:
+                    original_name = input_fighter_map[normalized]
+                    if original_name not in found_fights:
+                        found_fights[original_name] = fight
+
+        return found_fights
