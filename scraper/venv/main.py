@@ -33,23 +33,25 @@ class FighterListRequest(BaseModel):
     fighters: List[str]
 
 # Cached scraper functions 
-@ttl_cache(maxsize=1, ttl=60)
+@ttl_cache(maxsize=1, ttl=CACHE_TTL)
 def cached_get_all_ufc_fights():
     return UFC_SCRAPER.get_all_upcoming_fights()
 
-@ttl_cache(maxsize=128, ttl=60)
+@ttl_cache(maxsize=128, ttl=CACHE_TTL)
 def cached_get_upcoming_ufc_fights(fighters_key: tuple[str]):
-    return UFC_SCRAPER.get_upcoming_fights_for(list(fighters_key))
+    all_fights = cached_get_all_ufc_fights()
+    return UFC_SCRAPER.filter_fights_for(all_fights, list(fighters_key))
 
 
-@ttl_cache(maxsize=1, ttl=60)
+@ttl_cache(maxsize=1, ttl=CACHE_TTL)
 def cached_get_all_boxing_fights():
     return BOXING_SCRAPER.get_all_upcoming_fights()
 
 
-@ttl_cache(maxsize=128, ttl=60)
+@ttl_cache(maxsize=128, ttl=CACHE_TTL)
 def cached_get_upcoming_boxing_fights(fighters_key: tuple[str]):
-    return BOXING_SCRAPER.get_upcoming_fights_for(list(fighters_key))
+    all_fights = cached_get_all_boxing_fights()
+    return BOXING_SCRAPER.filter_fights_for(all_fights, list(fighters_key))
 
 # API Routes 
 @app.get("/")

@@ -101,13 +101,11 @@ class BoxingScraper:
         return all_fights
         
         
-    def get_upcoming_fights_for(self, fighters: List[str]) -> List[Fight]:
-        all_fights = self.get_all_upcoming_fights()
-        found_fights: dict[str, Fight] = {}
 
-        # Normalize input for case-insensitive matching
+    def filter_fights_for(self, all_fights: List[Fight], target_fighters: List[str]) -> dict[str, Fight]:
+        found_fights: dict[str, Fight] = {}
         input_fighter_map = {
-            f.lower(): f for f in fighters
+            f.lower(): f for f in target_fighters
         }
 
         for fight in all_fights:
@@ -117,5 +115,4 @@ class BoxingScraper:
                     original_name = input_fighter_map[normalized]
                     if original_name not in found_fights:
                         found_fights[original_name] = fight
-
         return found_fights

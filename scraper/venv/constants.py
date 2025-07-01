@@ -4,6 +4,8 @@ DEFAULT_USER_AGENT = (
     'Chrome/91.0.4472.124 Safari/537.36'
 )
 
+CACHE_TTL = 3600
+
 # ----- UFC -----
 BASE_UFC_URL = "https://www.ufc.com"
 UFC_EVENTS_PATH = "/events"

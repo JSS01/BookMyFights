@@ -151,32 +151,16 @@ class UFCScraper:
                 continue # Skip to the next event
         return all_fights
 
-    def get_upcoming_fights_for(self, target_fighters: List[str]) -> dict[str, Fight]:
-        """
-        Finds the next scheduled fight for a given list of fighters.
-
-        Args:
-            target_fighters: A list of fighter names to search for.
-
-        Returns:
-            A dictionary where keys are the found fighter names and
-            values are the corresponding Fight objects.
-        """
-        all_fights = self.get_all_upcoming_fights()
+    def filter_fights_for(self, all_fights: List[Fight], target_fighters: List[str]) -> dict[str, Fight]:
         found_fights = {}
-        
-        # Normalize target names for efficient lookup
         clean_target_map = {
             name.lower().replace(" ", ""): name for name in target_fighters
         }
-        
         for fight in all_fights:
             for fighter_in_fight in fight.fighters:
                 clean_fighter = fighter_in_fight.lower().replace(" ", "")
                 if clean_fighter in clean_target_map:
                     original_name = clean_target_map[clean_fighter]
-                    # Add only if we haven't found a fight for this target yet
                     if original_name not in found_fights:
                         found_fights[original_name] = fight
-        
         return found_fights
