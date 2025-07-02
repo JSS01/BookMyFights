@@ -22,7 +22,7 @@ import {
 
 
 
-const FightsModal = ({fights, openModal, setOpenModal}) => {
+const FightsModal = ({fights, openModal, setOpenModal, showSnackbar}) => {
 
 
     const [selectedFights, setSelectedFights] = useState([])
@@ -53,21 +53,31 @@ const FightsModal = ({fights, openModal, setOpenModal}) => {
                 {accessToken: accessToken, fights: fightsToSync},
                 { withCredentials: true }
             )
-            console.log("✅ Synced Events:", response.data.events);
-            alert("Successfully synced selected fights to Google Calendar.");
+            console.log("Synced Events:", response.data.events);
+            showSnackbar("Successfully synced selected fights to Google Calendar.");
+            setOpenModal(false)
 
         } catch (err) {
-            console.error("❌ Error syncing fights:", err.response?.data || err.message);
-            alert("Beeg errro")
+            console.error("Error syncing fights:", err.response?.data || err.message);
+            showSnackbar("Beeg errro", "error")
+            setOpenModal(false)
         }
 
     }
 
+    const onCloseModal = () => {
+        setOpenModal(false)
+        setSelectedFights([])
+    }
+    // Sort by date
+    const sortedFights = [...fights].sort((a, b) => new Date(a.start.dateTime) - new Date(b.start.dateTime));
+
+
   return (
-    <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="md">
-        <DialogTitle> Found {fights.length} Fights! </DialogTitle>
+    <Dialog open={openModal} onClose={onCloseModal} fullWidth maxWidth="md">
+        <DialogTitle> Found {sortedFights.length} Fights! </DialogTitle>
         <DialogContent dividers sx={{ maxHeight: '70vh' }}>
-        {fights.length > 0 ? (
+        {sortedFights.length > 0 ? (
             <TableContainer component={Paper}>
             <Table>
                 <TableHead>
@@ -79,7 +89,7 @@ const FightsModal = ({fights, openModal, setOpenModal}) => {
                 </TableRow>
                 </TableHead>
                 <TableBody>
-                {fights.map((fight, index) => (
+                {sortedFights.map((fight, index) => (
                     <TableRow key={index}>
                     <TableCell>{fight.summary}</TableCell>
                     <TableCell>{new Date(fight.start.dateTime).toLocaleString()}</TableCell>
@@ -110,7 +120,7 @@ const FightsModal = ({fights, openModal, setOpenModal}) => {
 
         </DialogContent>
         <DialogActions>
-        <Button onClick={() => setOpenModal(false)} color="primary">
+        <Button onClick={onCloseModal} color="primary">
             Close
         </Button>
         </DialogActions>

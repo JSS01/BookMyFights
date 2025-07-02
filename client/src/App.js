@@ -6,6 +6,7 @@ import HomePage from './pages/Homepage';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { UserProvider } from './contexts/UserContext.js'
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
+import AboutPage from './pages/About.js';
 
 function App() {
   const clientID = "805753642950-rookpvnesrtaa0j2ggq3ju1as5khiint.apps.googleusercontent.com"
@@ -18,6 +19,7 @@ function App() {
       <Navbar> </Navbar>
       <Routes> 
         <Route path='/' element={<HomePage/>}> </Route>
+        <Route path='/about' element={<AboutPage/>}> </Route>
         <Route path='/dashboard' 
                element={ 
                   <ProtectedRoute>

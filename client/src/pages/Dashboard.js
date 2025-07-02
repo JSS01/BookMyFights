@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useUser } from '../contexts/UserContext';
 import { Button } from '@mui/material';
-import SyncIcon from '@mui/icons-material/Sync';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import { Snackbar, Alert, Container, Typography, Box } from '@mui/material';
 
@@ -10,8 +9,6 @@ import FightsModal from '../components/FightsModal.js';
 import FightersSection from '../components/FightersSection';
 
 
-// TODO: When viewing upcoming fights, can add one fight at a time, 
-// and have button to add all fights to calendar as an option in that screen
 
 const Dashboard = () => {
   
@@ -53,7 +50,7 @@ const Dashboard = () => {
         showSnackbar(`Deleted ${fighter.name} from your list`)
       } catch (err) {
         console.error("Error deleting fighter: ", err);
-        showSnackbar(`Error deleting ${fighter.name} from your list`)
+        showSnackbar(`Error deleting ${fighter.name} from your list`, 'error')
       }
   }
 
@@ -75,27 +72,6 @@ const Dashboard = () => {
     }
   };
 
-  const syncFights = async () => {
-    try {
-      const accessToken = localStorage.getItem("google_access_token")
-      const res = await axios.post(
-        "http://localhost:3001/calendar/sync-fights", 
-        {accessToken: accessToken},
-        { withCredentials: true }
-      )
-      const numEventsAdded = res.data.events.length;
-      setupcomingFights(res.data.events); 
-      setOpenModal(true)
-
-      if (numEventsAdded === 0) {
-        showSnackbar("No upcoming fights for your fighters found")
-      } else {
-      showSnackbar(`Successfully added ${numEventsAdded} fights to your calendar`)
-      }
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   const viewFights = async () => {
     try {
@@ -111,7 +87,6 @@ const Dashboard = () => {
       console.error(err)
     }
   }
-
 
 
 
@@ -150,7 +125,7 @@ const Dashboard = () => {
       
      
       {/* Modals and Snackbar */}
-      <FightsModal fights={upcomingFights} openModal={openModal} setOpenModal={setOpenModal}>
+      <FightsModal fights={upcomingFights} openModal={openModal} setOpenModal={setOpenModal} showSnackbar={showSnackbar}>
       </FightsModal>
 
       <Snackbar

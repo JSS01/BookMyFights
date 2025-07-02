@@ -48,12 +48,12 @@ const TrackedFightersTable = ({ filteredFighters, deleteUserFighter }) => {
   return (
     <>
       <TableContainer component={Paper} sx={{ maxHeight: 270, maxWidth: 800, mt: 2 }}>
-        <Table>
-          <TableHead>
+        <Table stickyHeader>
+          <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
             <TableRow>
-              <TableCell>Fighter</TableCell>
-              <TableCell>Sport</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{fontWeight: "bold"}}>Fighter</TableCell>
+              <TableCell sx={{fontWeight: "bold"}}>Sport</TableCell>
+              <TableCell sx={{fontWeight: "bold"}} align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
