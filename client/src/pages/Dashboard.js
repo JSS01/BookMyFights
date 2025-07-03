@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { useUser } from '../contexts/UserContext';
 import { Button } from '@mui/material';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import { Snackbar, Alert, Container, Typography, Box } from '@mui/material';
@@ -12,7 +11,6 @@ import FightersSection from '../components/FightersSection';
 
 const Dashboard = () => {
   
-  const { user } = useUser();   
   const [userFighters, setUserFighters] = useState([]);
   const [upcomingFights, setupcomingFights] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -95,7 +93,7 @@ const Dashboard = () => {
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" textAlign={"center"} gutterBottom> 
-        Welcome, {user.userName}
+        Your Roster
       </Typography>
 
         <FightersSection 
